@@ -1,3 +1,3 @@
 # ratlab
 
-A funny labyrinth solving algorithm. Logic currently flawed.
+A funny labyrinth solving algorithm.
