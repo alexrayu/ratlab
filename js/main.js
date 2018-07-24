@@ -18,5 +18,5 @@ var timer = window.setInterval(function() {
     clearInterval(timer);
     alert("Panic!");
   }
-}, 100);
+}, 300);
 

@@ -2,7 +2,6 @@ var rat = function (map) {
   var rat = this;
   this.start = findChar('S');
   this.pos = findChar('S');
-  this.prevPos = {x: -1, y: -1};
   this.finish = findChar('F');
   this.moves = 0;
   this.success = false;
@@ -15,64 +14,103 @@ var rat = function (map) {
   this.move = function () {
     rat.moves++;
     if (rat.moves < 2) return;
-    var status = estStatus();
-    if (status == 'move') {
-      if (canMove()) {
-        doMove();
-      }
-      else {
-        turn();
-      }
-    }
-    
-    return status;
-  }
-  
-  /**
-   * Perform a move.
-   */
-  function doMove() {
-    rat.concurrentTurns = 0;
-    rat.prevPos.x = rat.pos.x;
-    rat.prevPos.y = rat.pos.y;
-    switch (rat.heading) {
-      case 'n':
-        rat.pos.y--;
-        break;
-      case 'e':
-        rat.pos.x++;
-        break;
-      case 's':
-        rat.pos.y++;
-        break;
-      case 'w':
-        rat.pos.x--;
-        break;
-    }
-  }
-  
-  /**
-   * Checks if left wall is present.
-   */
-  function isLeftWall() {
     var res = false;
+
+    var status = estStatus();
+    if (status != 'move') {
+      return status;
+    }
+
     switch (rat.heading) {
       case 'n':
-        res = isNavigable(rat.pos.x - 1, rat.pos.y - 1);
+        res = isNavigable(rat.pos.x - 1, rat.pos.y);
+        if (res) {
+          rat.pos.x--;
+          rat.heading = 'w';
+          return;
+        }
+        res = isNavigable(rat.pos.x, rat.pos.y - 1);
+        if (res) {
+          rat.pos.y--;
+          rat.heading = 'n';
+          return;
+        }
+        res = isNavigable(rat.pos.x + 1, rat.pos.y);
+        if (res) {
+          rat.pos.x++;
+          rat.heading = 'e';
+          return;
+        }
+        turn();
         break;
       case 'e':
-        res = isNavigable(rat.pos.x + 1, rat.pos.y - 1);
+        res = isNavigable(rat.pos.x, rat.pos.y - 1);
+        if (res) {
+          rat.pos.y--;
+          rat.heading = 'n';
+          return;
+        }
+        res = isNavigable(rat.pos.x + 1, rat.pos.y);
+        if (res) {
+          rat.pos.x++;
+          rat.heading = 'e';
+          return;
+        }
+        res = isNavigable(rat.pos.x, rat.pos.y + 1);
+        if (res) {
+          rat.pos.y++;
+          rat.heading = 's';
+          return;
+        }
+        turn();
         break;
       case 's':
-        res = isNavigable(rat.pos.x + 1, rat.pos.y + 1);
+        res = isNavigable(rat.pos.x + 1, rat.pos.y);
+        if (res) {
+          rat.pos.x++;
+          rat.heading = 'e';
+          return;
+        }
+        res = isNavigable(rat.pos.x, rat.pos.y + 1);
+        if (res) {
+          rat.pos.y++;
+          rat.heading = 's';
+          return;
+        }
+        res = isNavigable(rat.pos.x - 1, rat.pos.y);
+        if (res) {
+          rat.pos.x--;
+          rat.heading = 'w';
+          return;
+        }
+        turn();
         break;
       case 'w':
-        res = isNavigable(rat.pos.x - 1, rat.pos.y + 1);
+        res = isNavigable(rat.pos.x, rat.pos.y + 1);
+        if (res) {
+          rat.pos.y++;
+          rat.heading = 's';
+          return;
+        }
+        res = isNavigable(rat.pos.x - 1, rat.pos.y);
+        if (res) {
+          rat.pos.x--;
+          rat.heading = 'w';
+          return;
+        }
+        res = isNavigable(rat.pos.x, rat.pos.y - 1);
+        if (res) {
+          rat.pos.y--;
+          rat.heading = 'n';
+          return;
+        }
+        turn();
         break;
     }
-    return !res;
-  }
-  
+
+    return status;
+  };
+
   /**
    * Perform a turn.
    */
@@ -96,37 +134,7 @@ var rat = function (map) {
     rat.heading = newHeading;
     rat.concurrentTurns++;
   }
-  
-  /**
-   * Estimate whether move forward is possible.
-   */
-  function canMove() {
-    var res = false;
-    var newPos = {x: -2, y: -2};
-    switch (rat.heading) {
-      case 'n':
-        newPos = {x: rat.pos.x, y: rat.pos.y - 1};
-        res = isNavigable(rat.pos.x, rat.pos.y - 1);
-        break;
-      case 'e':
-        newPos = {x: rat.pos.x + 1, y: rat.pos.y};
-        res = isNavigable(rat.pos.x + 1, rat.pos.y);
-        break;
-      case 's':
-        newPos = {x: rat.pos.x, y: rat.pos.y + 1};
-        res = isNavigable(rat.pos.x, rat.pos.y + 1);
-        break;
-      case 'w':
-        newPos = {x: rat.pos.x - 1, y: rat.pos.y};
-        res = isNavigable(rat.pos.x - 1, rat.pos.y);
-        break;
-    }
-    if (newPos.x == rat.prevPos.x && newPos.y == rat.prevPos.y && rat.concurrentTurns < 5) {
-      res = false;
-    }
-    return res;
-  }
-  
+
   /**
    * Checks whether a position is navigable.
    */
@@ -175,11 +183,11 @@ var rat = function (map) {
           return {
             x: x,
             y: y
-          }
+          };
         }
       }
     }
     return false;
   }
   
-}  
+};
