@@ -1,8 +1,9 @@
 var rat = function (map) {
   var rat = this;
   this.start = findChar('S');
+  this.pos = findChar('S');
+  this.prevPos = {x: -1, y: -1};
   this.finish = findChar('F');
-  this.pos = this.start;
   this.moves = 0;
   this.success = false;
   this.heading = 'n';
@@ -32,6 +33,8 @@ var rat = function (map) {
    */
   function doMove() {
     rat.concurrentTurns = 0;
+    rat.prevPos.x = rat.pos.x;
+    rat.prevPos.y = rat.pos.y;
     switch (rat.heading) {
       case 'n':
         rat.pos.y--;
@@ -49,40 +52,79 @@ var rat = function (map) {
   }
   
   /**
+   * Checks if left wall is present.
+   */
+  function isLeftWall() {
+    var res = false;
+    switch (rat.heading) {
+      case 'n':
+        res = isNavigable(rat.pos.x - 1, rat.pos.y - 1);
+        break;
+      case 'e':
+        res = isNavigable(rat.pos.x + 1, rat.pos.y - 1);
+        break;
+      case 's':
+        res = isNavigable(rat.pos.x + 1, rat.pos.y + 1);
+        break;
+      case 'w':
+        res = isNavigable(rat.pos.x - 1, rat.pos.y + 1);
+        break;
+    }
+    return !res;
+  }
+  
+  /**
    * Perform a turn.
    */
   function turn() {
+    var newHeading = '';
     switch (rat.heading) {
       case 'n':
-        rat.heading = 'e';
+        newHeading = 'e';
         break;
       case 'e':
-        rat.heading = 's';
+        newHeading = 's';
         break;
       case 's':
-        rat.heading = 'w';
+        newHeading = 'w';
         break;
       case 'w':
-        rat.heading = 'n';
+        newHeading = 'n';
         break;
     }
-    this.concurrentTurns++;
+
+    rat.heading = newHeading;
+    rat.concurrentTurns++;
   }
   
   /**
    * Estimate whether move forward is possible.
    */
   function canMove() {
+    var res = false;
+    var newPos = {x: -2, y: -2};
     switch (rat.heading) {
       case 'n':
-        return isNavigable(rat.pos.x, rat.pos.y - 1);
+        newPos = {x: rat.pos.x, y: rat.pos.y - 1};
+        res = isNavigable(rat.pos.x, rat.pos.y - 1);
+        break;
       case 'e':
-        return isNavigable(rat.pos.x + 1, rat.pos.y);
+        newPos = {x: rat.pos.x + 1, y: rat.pos.y};
+        res = isNavigable(rat.pos.x + 1, rat.pos.y);
+        break;
       case 's':
-        return isNavigable(rat.pos.x, rat.pos.y + 1);
+        newPos = {x: rat.pos.x, y: rat.pos.y + 1};
+        res = isNavigable(rat.pos.x, rat.pos.y + 1);
+        break;
       case 'w':
-        return isNavigable(rat.pos.x - 1, rat.pos.y);
+        newPos = {x: rat.pos.x - 1, y: rat.pos.y};
+        res = isNavigable(rat.pos.x - 1, rat.pos.y);
+        break;
     }
+    if (newPos.x == rat.prevPos.x && newPos.y == rat.prevPos.y && rat.concurrentTurns < 5) {
+      res = false;
+    }
+    return res;
   }
   
   /**
@@ -113,6 +155,9 @@ var rat = function (map) {
     if (rat.pos.x == rat.start.x && rat.pos.y == rat.start.y && rat.moves > 5) {
       return 'panic';
     }
+    else if (rat.concurrentTurns > 10) {
+      return 'panic';
+    }
     else if (rat.pos.x == rat.finish.x && rat.pos.y == rat.finish.y) {
       return 'success';
     }
@@ -134,7 +179,7 @@ var rat = function (map) {
         }
       }
     }
-    return FALSE;
+    return false;
   }
   
 }  

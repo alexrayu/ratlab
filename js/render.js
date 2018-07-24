@@ -25,7 +25,7 @@ var renderer = function (map, rat) {
     var mapArray = map.getMap();
     for (var y = 0; y < renderer.viewPort.mapHeight; y++) {
       for (var x = 0; x < renderer.viewPort.mapWidth; x++) {
-        var item = mapArray[x][y];
+        var item = mapArray[y][x];
         switch (item) {
           case '0':
             renderer.ctx.fillStyle = 'black';
