@@ -1,6 +1,6 @@
  
-var Level = new level('levels/level1.txt');
-var map = {}
+var Level = new level('levels/level2.txt');
+var map = {};
 map.map = Level.getMap();
 map.width = map.map[0].length;
 map.height = map.map.length;
@@ -16,5 +16,5 @@ var timer = window.setInterval(function() {
     if (res == 'panic') {
     clearInterval(timer);
   }
-}, 300);
+}, 100);
 

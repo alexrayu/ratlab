@@ -28,6 +28,7 @@ var renderer = function (map, rat) {
         var item = mapArray[y][x];
         switch (item) {
           case '0':
+          case '=':
             renderer.ctx.fillStyle = 'black';
             break;
           case 'S':
