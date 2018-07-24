@@ -12,11 +12,9 @@ var timer = window.setInterval(function() {
   Renderer.render();
   if (res == 'success') {
     clearInterval(timer);
-    alert("The rat found the cheese.");
   }
     if (res == 'panic') {
     clearInterval(timer);
-    alert("Panic!");
   }
 }, 300);
 
