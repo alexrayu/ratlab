@@ -58,13 +58,21 @@ var renderer = function (map, rat) {
     dy = 0;
     switch (rat.heading) {
       case 'n':
-        dy = renderer.viewPort.pixelsPerChar / 2;
-      case 'e':
-        dx = renderer.viewPort.pixelsPerChar / 2;
-      case 's':
-        dy = renderer.viewPort.pixelsPerChar / 8;
-      case 'w':
         dx = renderer.viewPort.pixelsPerChar / 8;
+        dy = - (renderer.viewPort.pixelsPerChar / 4) + 1;
+        break;
+      case 'e':
+        dx = (renderer.viewPort.pixelsPerChar / 2) - 1;
+        dy = renderer.viewPort.pixelsPerChar / 8;
+        break;
+      case 's':
+        dx = renderer.viewPort.pixelsPerChar / 8;
+        dy = (renderer.viewPort.pixelsPerChar / 2) - 1;
+        break;
+      case 'w':
+        dx = - (renderer.viewPort.pixelsPerChar / 4) + 1;
+        dy = renderer.viewPort.pixelsPerChar / 8;
+        break;
     }
     
     // Rat.
@@ -76,11 +84,11 @@ var renderer = function (map, rat) {
                      renderer.viewPort.pixelsPerChar / 2);
     
     // Head.
-    renderer.ctx.fillStyle = 'black';
+    renderer.ctx.fillStyle = 'grey';
     renderer.ctx.fillRect(ratDrawX + dx, 
                      ratDrawY + dy, 
-                     renderer.viewPort.pixelsPerChar / 8, 
-                     renderer.viewPort.pixelsPerChar / 8);
+                     renderer.viewPort.pixelsPerChar / 4,
+                     renderer.viewPort.pixelsPerChar / 4);
   }
   
   /**
@@ -102,8 +110,8 @@ var renderer = function (map, rat) {
     renderer.viewPort.mapHeight = mapArray.length;
     renderer.canvas.setAttribute('width', mapArray[0].length * renderer.viewPort.pixelsPerChar);
     renderer.canvas.setAttribute('height', mapArray.length * renderer.viewPort.pixelsPerChar);
-    renderer.canvas.style.width = (mapArray[0].length * renderer.viewPort.pixelsPerChar) + 'px';
-    renderer.canvas.style.height = (mapArray.length * renderer.viewPort.pixelsPerChar) + 'px';
+    renderer.canvas.style.width = ((mapArray[0].length - 1) * renderer.viewPort.pixelsPerChar) + 'px';
+    renderer.canvas.style.height = ((mapArray.length - 1) * renderer.viewPort.pixelsPerChar) + 'px';
   }
 
   /**
