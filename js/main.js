@@ -9,12 +9,12 @@ var Renderer = new renderer(Level, Rat);
 
 var timer = window.setInterval(function() {
   var res = Rat.move();
-  Renderer.render();
-  if (res == 'success') {
+  if (res === 'success') {
     clearInterval(timer);
   }
-    if (res == 'panic') {
+    if (res === 'panic') {
     clearInterval(timer);
   }
+  Renderer.render(res);
 }, 100);
 
